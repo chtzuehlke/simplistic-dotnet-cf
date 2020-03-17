@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+    API:
+        Type: "AWS::ApiGatewayV2::Api"
+        Properties:
+            Name: test
+            ProtocolType: HTTP
+
+    Route:
+        Type: "AWS::ApiGatewayV2::Route"
+        Properties:
+            ApiId: !Ref API
+            #AuthorizationScopes
+            AuthorizationType: "NONE" #FIXME JWT
+            #AuthorizerId
+            RouteKey: $default
+            Target: !Sub "integrations/${Integration}"
+
+    Integration:
+        Type: "AWS::ApiGatewayV2::Integration"
+        Properties:
+            ApiId: !Ref API
+            ConnectionType: "INTERNET" #FIXME VPC_LINK
+            IntegrationMethod: ANY
+            IntegrationType: HTTP_PROXY
+            IntegrationUri: http://tschenett.ch
+            PayloadFormatVersion: "1.0"
+            #TlsConfig
+
+    Stage:
+        Type: "AWS::ApiGatewayV2::Stage"
+        Properties: 
+            ApiId: !Ref API
+            AutoDeploy: true
+            #DeploymentId: !Ref Deployment
+            StageName: $default
+
+    #Deployment:
+    #    Type: "AWS::ApiGatewayV2::Deployment"
+    #    Properties:
+    #        ApiId: !Ref API
+    #        StageName 
+
+Outputs:
+    API:
+        Value: !Ref API
