@@ -28,6 +28,27 @@ Resources:
             PayloadFormatVersion: "1.0"
             #TlsConfig
 
+    Route2:
+        Type: "AWS::ApiGatewayV2::Route"
+        Properties:
+            ApiId: !Ref API
+            #AuthorizationScopes
+            AuthorizationType: "NONE" #FIXME JWT
+            #AuthorizerId
+            RouteKey: ANY /furthermore/{proxy+}
+            Target: !Sub "integrations/${Integration2}"
+
+    Integration2:
+        Type: "AWS::ApiGatewayV2::Integration"
+        Properties:
+            ApiId: !Ref API
+            ConnectionType: "INTERNET" #FIXME VPC_LINK
+            IntegrationMethod: ANY
+            IntegrationType: HTTP_PROXY
+            IntegrationUri: http://furthermore.ch/{proxy}
+            PayloadFormatVersion: "1.0"
+            #TlsConfig
+
     Stage:
         Type: "AWS::ApiGatewayV2::Stage"
         Properties: 
