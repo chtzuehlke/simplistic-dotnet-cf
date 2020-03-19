@@ -11,11 +11,23 @@ Resources:
         Type: "AWS::ApiGatewayV2::Route"
         Properties:
             ApiId: !Ref API
-            #AuthorizationScopes
-            AuthorizationType: "NONE" #FIXME JWT
-            #AuthorizerId
+            AuthorizationType: "NONE"
             RouteKey: $default
             Target: !Sub "integrations/${Integration}"
+
+    Authorizer:
+        Type: "AWS::ApiGatewayV2::Authorizer"
+        Properties:
+            ApiId: !Ref API
+            AuthorizerType: JWT
+            IdentitySource: 
+                - "$request.header.Authorization"
+            Name: JWTAuthorizer
+            JwtConfiguration:
+                Audience: #FIXME
+                    #- urn:amazon:cognito:sp:eu-central-1_Z2jjKN2eh
+                    - 7i8d9tc0ooeb9qsbupmq75s235
+                Issuer: https://cognito-idp.eu-central-1.amazonaws.com/eu-central-1_Z2jjKN2eh
 
     Integration:
         Type: "AWS::ApiGatewayV2::Integration"
@@ -24,7 +36,8 @@ Resources:
             ConnectionType: "INTERNET" #FIXME VPC_LINK
             IntegrationMethod: ANY
             IntegrationType: HTTP_PROXY
-            IntegrationUri: http://tschenett.ch
+            #IntegrationUri: http://tschenett.ch
+            IntegrationUri: https://s3-s3bucketforwebsitecontent-1kllk7g007r2l.s3.eu-central-1.amazonaws.com
             PayloadFormatVersion: "1.0"
             #TlsConfig
 
@@ -32,9 +45,10 @@ Resources:
         Type: "AWS::ApiGatewayV2::Route"
         Properties:
             ApiId: !Ref API
-            #AuthorizationScopes
-            AuthorizationType: "NONE" #FIXME JWT
-            #AuthorizerId
+            AuthorizationType: "JWT"
+            AuthorizerId: !Ref Authorizer
+            #AuthorizationScopes:
+            #    - openid
             RouteKey: ANY /furthermore/{proxy+}
             Target: !Sub "integrations/${Integration2}"
 

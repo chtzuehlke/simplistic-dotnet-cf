@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  APIDomainName:
+    Type: String
+    Default: "1px8b2i533.execute-api.eu-central-1.amazonaws.com"
+
+  UserPoolDomainName:
+    Type: String
+    Default: "www-dev-zuehlke-p-iraten-ch"
+
+  #Subnets:
+  #  Type: "List<AWS::EC2::Subnet::Id>"
+
+  #VPC:
+  #  Type: "AWS::EC2::VPC::Id"
+
+Resources:
+  #S3BucketForWebsiteContent:
+  #  Type: AWS::S3::Bucket
+
+  #VPCLink:
+  #  Type: "AWS::ApiGateway::VpcLink"
+  #  Properties:
+  #    Name: Fargate Service NLB
+  #    TargetArns: 
+  #      - !Ref LoadBalancer
+
+  #Authorizer:
+  #  Type: "AWS::ApiGateway::Authorizer"
+  #  Properties:
+  #    IdentitySource: method.request.header.Authorization
+  #    Name: Cognito
+  #    ProviderARNs:
+  #      - !GetAtt UserPool.Arn
+  #    RestApiId: !Ref APIGateway
+  #    Type: COGNITO_USER_POOLS
+  
+  #CustomDomain:
+  #  Type: "AWS::ApiGateway::DomainName"
+  #  Properties:
+  #    RegionalCertificateArn: !ImportValue SSLCert
+  #    DomainName: !Ref APIDomainName
+  #    EndpointConfiguration:
+  #      Types: 
+  #        - REGIONAL
+
+  #APIDNSName:
+  #  Type: AWS::Route53::RecordSet
+  #  Properties:
+  #    HostedZoneId: !ImportValue HostedZoneId
+  #    Comment: API GW
+  #    Name: !Ref APIDomainName
+  #    Type: CNAME
+  #    TTL: '60'
+  #    ResourceRecords:
+  #      - !GetAtt CustomDomain.RegionalDomainName
+
+  UserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: False
+        UnusedAccountValidityDays: 365
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+
+  UserPoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:            
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthFlowsUserPoolClient: True
+      AllowedOAuthScopes:
+        - openid
+      CallbackURLs:
+        - !Sub "https://${APIDomainName}/index.html"
+      LogoutURLs:
+        - !Sub "https://${APIDomainName}/index.html"
+      DefaultRedirectURI: !Sub "https://${APIDomainName}/index.html"
+      GenerateSecret: True
+      SupportedIdentityProviders:
+        - COGNITO
+      UserPoolId: !Ref UserPool
+
+  UserPoolDomain:
+    Type: "AWS::Cognito::UserPoolDomain"
+    Properties:
+      Domain: !Ref UserPoolDomainName
+      UserPoolId: !Ref UserPool
+
+Outputs:
+  WebURL:
+    Value: !Sub "https://${APIDomainName}"
+
+  #WebBucket:
+  #  Value: !Ref 'S3BucketForWebsiteContent'
+
+  UserPoolId:
+    Value: !Ref UserPool
+
+  CognitoUserPoolClientId:
+    Value: !Ref UserPoolClient
+
+  CognitoAppWebDomain:
+    Value: !Sub "${UserPoolDomainName}.auth.eu-central-1.amazoncognito.com" #FIXME region independent

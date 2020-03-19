@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+    S3BucketForWebsiteContent:
+      Type: AWS::S3::Bucket
+  
+Outputs:
+    S3BucketForWebsiteContent:
+        Value: !Ref S3BucketForWebsiteContent
