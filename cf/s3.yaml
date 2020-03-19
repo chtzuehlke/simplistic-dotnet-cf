@@ -3,6 +3,10 @@ AWSTemplateFormatVersion: "2010-09-09"
 Resources:
     S3BucketForWebsiteContent:
       Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+            IndexDocument: index.html
   
 Outputs:
     S3BucketForWebsiteContent:

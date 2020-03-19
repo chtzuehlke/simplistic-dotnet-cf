@@ -37,7 +37,8 @@ Resources:
             IntegrationMethod: ANY
             IntegrationType: HTTP_PROXY
             #IntegrationUri: http://tschenett.ch
-            IntegrationUri: https://s3-s3bucketforwebsitecontent-1kllk7g007r2l.s3.eu-central-1.amazonaws.com
+            #IntegrationUri: https://s3-s3bucketforwebsitecontent-1kllk7g007r2l.s3.eu-central-1.amazonaws.com
+            IntegrationUri: http://s3-s3bucketforwebsitecontent-1kllk7g007r2l.s3-website.eu-central-1.amazonaws.com
             PayloadFormatVersion: "1.0"
             #TlsConfig
 
